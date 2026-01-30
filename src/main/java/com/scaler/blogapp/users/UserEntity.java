@@ -6,10 +6,12 @@ import lombok.*;
 
 
 @Entity(name = "users")
+@Builder
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserEntity {
     @Id
