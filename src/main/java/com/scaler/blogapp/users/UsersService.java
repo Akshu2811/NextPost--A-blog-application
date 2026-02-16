@@ -1,7 +1,10 @@
 package com.scaler.blogapp.users;
 
+import com.scaler.blogapp.security.JWTService;
 import com.scaler.blogapp.users.dtos.CreateUserRequest;
 import com.scaler.blogapp.users.dtos.LoginUserRequest;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -10,17 +13,26 @@ import java.util.Optional;
 public class UsersService {
 
     private UsersRepository usersRepository;
+    private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsersService(UsersRepository usersRepository) {
+
+    public UsersService(UsersRepository usersRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
         this.usersRepository = usersRepository;
+        this.modelMapper= modelMapper;
+        this.passwordEncoder=passwordEncoder;
+
     }
 
     public UserEntity createUser(CreateUserRequest req){
-        var newUser = UserEntity.builder()
+        UserEntity newUser = modelMapper.map(req,UserEntity.class);
+
+        newUser.setPassword(passwordEncoder.encode(req.getPassword()));
+       /* var newUser = UserEntity.builder()
                 .username(req.getUsername())
-//                .password(req.getPassword())// TODO: encrypt password
+//                .password(req.getPassword())
                 .email(req.getEmail())
-                .build();
+                .build();*/
         return usersRepository.save(newUser);
 
     }
@@ -31,13 +43,14 @@ public class UsersService {
 
     public UserEntity getUser(Long userId){
         return usersRepository.findById(userId) .orElseThrow(() -> new UserNotFoundException(userId));
+
     }
 
-    public UserEntity loginUser(LoginUserRequest req){
-        var user = usersRepository.findByUsername(req.getUsername()).orElseThrow(() -> new UserNotFoundException(req.getUsername()));
+    public UserEntity loginUser(String Username,String Password){
+        var user = usersRepository.findByUsername(Username).orElseThrow(() -> new UserNotFoundException(Username));
+        var passMatch= passwordEncoder.matches(Password,user.getPassword());
+        if(!passMatch) throw new InvalidCredentialsException();
 
-
-        // TODO: match password
         return user;
 
     }
@@ -49,6 +62,13 @@ public class UsersService {
 
         public UserNotFoundException(Long userId) {
             super("User with id: " + userId + " not found");
+        }
+    }
+
+    public static class InvalidCredentialsException extends IllegalArgumentException{
+
+        public InvalidCredentialsException() {
+            super("Invalid username or password");
         }
     }
 }

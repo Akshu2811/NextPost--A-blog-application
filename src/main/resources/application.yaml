@@ -2,11 +2,11 @@ server:
   port: 8855
 spring:
   datasource:
-    url: jdbc:h2:file:./blogapp
+    url: jdbc:h2:file:./blogapp;
     driverClassName: org.h2.Driver
   application:
     name: blogapp
   jpa:
     hibernate:
-      ddl-auto: create #in prod use update
+      ddl-auto: update #in prod use update
 
