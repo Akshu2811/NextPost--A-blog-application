@@ -33,6 +33,7 @@ public class AppSecurityConfig{
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/users/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/articles/**").permitAll()
                         .anyRequest().authenticated()
                 );
         http

@@ -1,5 +1,7 @@
 package com.scaler.blogapp.articles;
 
+import com.scaler.blogapp.users.UserEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,16 @@ public class ArticlesController {
 */
     @GetMapping("")
     public String getArticles(){
-        return "articles";
+        return "get all articles";
+    }
+
+    @GetMapping("/{id}")
+    public String getArticleById(@PathVariable("id") String id){
+        return "get article by id" + id;
+    }
+
+    @PostMapping("")
+    public String createArticle(@AuthenticationPrincipal UserEntity user){
+        return "create article called by" + user.getUsername();
     }
 }

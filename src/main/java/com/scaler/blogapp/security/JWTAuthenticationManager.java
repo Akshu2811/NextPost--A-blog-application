@@ -4,6 +4,7 @@ import com.scaler.blogapp.users.UsersService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class JWTAuthenticationManager implements AuthenticationManager {
 
@@ -20,22 +21,19 @@ public class JWTAuthenticationManager implements AuthenticationManager {
 
         if (authentication instanceof JWTAuthentication){
 
-            var jwtAuthentication = (JWTAuthentication) authentication;
-            var jwt = jwtAuthentication.getCredentials();
-            var userId = jwtService.retrieveUserId(jwt);
-            var userEntity = usersService.getUser(userId);
 
-            jwtAuthentication.userEntity = userEntity;
-            jwtAuthentication.setAuthenticated(true);
 
-            return jwtAuthentication;
+                var jwtAuthentication = (JWTAuthentication) authentication;
+                var jwt = jwtAuthentication.getCredentials();
+                var userId = jwtService.retrieveUserId(jwt);
+                var userEntity = usersService.getUser(userId);
+
+                jwtAuthentication.userEntity = userEntity;
+                jwtAuthentication.setAuthenticated(true);
+                return jwtAuthentication;
+
         }
-
-
-        throw new IllegalAccessError("Cannot authenticate with non-JWT authentication");
-
-
-
+            throw new IllegalAccessError("Cannot authenticate with non-JWT authentication");
 
     }
 }
